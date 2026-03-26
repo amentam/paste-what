@@ -1,29 +1,28 @@
 import { ErrorBoundary } from "react-error-boundary";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getQueryClient } from "@/trpc/server";
-import { getSession } from "@/lib/auth";
+import { getSession, redirectToLogin } from "@/lib/auth";
 
-import { LandingPageContents } from "./_ui/landing-page-contents";
+import { HomePageContents } from "./_ui/home-page-contents";
 
-const LandingPage = async () => {
+const HomePage = async () => {
   const session = await getSession();
 
-  if(session) redirect("/home");
-
+  if(!session) redirectToLogin("/home");
+  
   const queryClient = getQueryClient();
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <ErrorBoundary fallback={<div>There was an error</div>}>
         <Suspense fallback={<div>Loading...</div>}>
-          <LandingPageContents/>
+          <HomePageContents/>
         </Suspense>
       </ErrorBoundary>
     </HydrationBoundary>
   );
 };
 
-export default LandingPage;
+export default HomePage;
